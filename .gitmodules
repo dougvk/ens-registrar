@@ -1,0 +1,3 @@
+[submodule "contracts/ens"]
+	path = contracts/ens
+	url = git@github.com:ethereum/ens.git
