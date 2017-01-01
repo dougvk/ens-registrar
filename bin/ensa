@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+var yargs = require('yargs');
+var auctionRegistar = require('../lib/ensAuction');
+
+var args = yargs
+  .command('check', 'Check the status of the name with the registrar', function(yargs) {
+    return yargs.option('host', {
+      description: "HTTP host of Ethereum node",
+      alias: 'h',
+      default: 'testrpc'
+    }).option('port', {
+      description: "HTTP port",
+      alias: 'p',
+      default: '8545'
+    }).option('address', {
+      description: "The address of the registrar",
+      alias: 'a',
+      type: "string"
+    }).demand(['address'])
+  })
+  .help()
+  .usage("Usage: $0 [command] [options]");
+
+var argv = args.argv;
+
+if (argv._.length == 0) {
+  args.showHelp();
+}
+
+var command = argv._[0];
