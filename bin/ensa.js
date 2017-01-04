@@ -25,9 +25,9 @@ var args = yargs
       type: "string"
     })
     .option('max', {
-      description: "The maximum amount willing to pay for the name",
+      description: "The maximum amount willing to pay for the name, in Ether",
       alias: 'm',
-      type: 'number'
+      type: 'string'
     })
     .option('salt', {
       description: "The secret 'salt' for unsealing your bid",
