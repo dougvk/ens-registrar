@@ -34,4 +34,18 @@ contract("ENS integration", function(accounts) {
         });
     })
   });
+
+  it("can reveal a bid", function() {
+    auctionRegistrar.createBid('test', accounts[0], '1.123', web3.sha3('secret'), function() {
+      auctionRegistrar.revealBid('test', accounts[0], '1.123', web3.sha3('secret'), function() {
+        registrar.entries(web3.sha3('test'))
+          .then(function(entry) {
+            assert.equal(1.123, web3.fromWei(entry[4], 'ether').toNumber(), 'winning bid amount is correct');
+            return Deed.at(entry[1]).owner();
+          }).then(function(owner) {
+            assert.equal(owner, accounts[0], 'owner of the winning bid is correct');
+          });
+      });
+    });
+  });
 });
