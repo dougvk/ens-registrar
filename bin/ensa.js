@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var yargs = require('yargs');
-var auctionRegistar = require('../lib/ensAuction');
+var Registrar = require('../lib/ensAuction');
+var Web3 = require("web3");
 
 var args = yargs
   .command('bid', 'Place a bid on a domain name', function(yargs) {
@@ -13,6 +14,11 @@ var args = yargs
       description: "HTTP port",
       alias: 'p',
       default: '8545'
+    })
+    .option('registrar', {
+      description: "The address of the registrar",
+      alias: 'r',
+      type: 'string'
     })
     .option('name', {
       description: "The name you want to register",
@@ -34,7 +40,7 @@ var args = yargs
       alias: 's',
       type: 'string'
     })
-    .demand(['account', 'max', 'secret', 'name'])
+    .demand(['account', 'max', 'secret', 'name', 'registrar'])
   })
   .command('reveal', 'Reveal your bid on a domain name', function(yargs) {
     return yargs.option('host', {
@@ -69,42 +75,6 @@ var args = yargs
     })
     .demand(['account', 'max', 'secret', 'name'])
   })
-  .command('finalize', 'Finalize the bid on a domain name', function(yargs) {
-    return yargs.option('host', {
-      description: "HTTP host of Ethereum node",
-      alias: 'h',
-      default: 'testrpc'
-    })
-    .option('port', {
-      description: "HTTP port",
-      alias: 'p',
-      default: '8545'
-    })
-    .option('name', {
-      description: "The name you want to register",
-      alias: 'n',
-      type: "string"
-    })
-    .demand(['name'])
-  })
-  .command('winner', 'Check the current winner', function(yargs) {
-    return yargs.option('host', {
-      description: "HTTP host of Ethereum node",
-      alias: 'h',
-      default: 'testrpc'
-    })
-    .option('port', {
-      description: "HTTP port",
-      alias: 'p',
-      default: '8545'
-    })
-    .option('name', {
-      description: "The name you want to register",
-      alias: 'n',
-      type: "string"
-    })
-    .demand(['name'])
-  })
   .help()
   .usage("Usage: $0 [command] [options]");
 
@@ -115,3 +85,12 @@ if (argv._.length == 0) {
 }
 
 var command = argv._[0];
+
+if (command == 'bid') {
+  var provider = new Web3(new Web3.providers.HttpProvider("http://" + argv.host + ":" + argv.port));
+  provider.eth.defaultAccount = argv.account;
+  var registrar = new Registrar(provider, argv.registrar, argv.account);
+  registrar.createBid(argv.name, argv.account, argv.max, argv.secret, function() {
+    console.log("Created bid.");
+  });
+}
