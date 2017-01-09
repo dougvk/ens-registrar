@@ -15,18 +15,20 @@ contract("ENS integration", function(accounts) {
     auctionRegistrar = new ENSAuction(new Web3.providers.HttpProvider('http://testrpc:8545'), registrar.address, accounts[0]);
   });
 
+  it("demonstrates that the domain name isn't available", function() {
+    return assert.eventually.isTrue(auctionRegistrar.available('test'), 'test is available as a domain name');
+  });
+
   it("demonstrates that the domain name isn't up for auction", function() {
-    //assert.isTrue(auctionRegistrar.available('test'), 'test is available as a domain name');
-    assert.eventually.isTrue(auctionRegistrar.available('test'), 'test is available as a domain name');
-    assert.eventually.isFalse(auctionRegistrar.upForAuction('test'), 'test isn\'t up for auction');
+    return assert.eventually.isFalse(auctionRegistrar.upForAuction('test'), 'test isn\'t up for auction');
   });
 
   it("can start an auction", function() {
-    assert.eventually.isTrue(auctionRegistrar.startAuction('test', {from: accounts[0], gas: 1000000}), 'auction can\' start');
+    return assert.eventually.isTrue(auctionRegistrar.startAuction('test', {from: accounts[0], gas: 1000000}), 'auction can\' start');
   });
 
   it("can start a bid", function() {
-    assert.eventually.isTrue(Promise.resolve(auctionRegistrar.createBid('test', accounts[0], '1.123', web3.sha3('secret')))
+    return assert.eventually.isTrue(auctionRegistrar.createBid('test', accounts[0], '1.123', web3.sha3('secret'))
       .then(function() {
         return registrar.entries(web3.sha3('test'))
       })
@@ -38,7 +40,7 @@ contract("ENS integration", function(accounts) {
   });
 
   it("can reveal a bid", function() {
-    assert.eventually.isTrue(Promise.resolve(auctionRegistrar.createBid('test', accounts[0], '1.123', web3.sha3('secret')))
+    return assert.eventually.isTrue(auctionRegistrar.createBid('test', accounts[0], '.00003', web3.sha3('secret'))
       .then(function() {
         return registrar.entries(web3.sha3('test'))
       })
@@ -46,8 +48,6 @@ contract("ENS integration", function(accounts) {
         assert.isAbove(entry[2].toNumber() * 1000, Date.now(), 'the end date of the bid is greater than now');
         return Promise.resolve(true);
       })
-    )
-    //auctionRegistrar.createBid('test', accounts[0], '.00003', web3.sha3('secret'))
       //.then(function() {
         //return auctionRegistrar.revealBid('test', accounts[0], '.00003', web3.sha3('secret'));
       //})
@@ -64,6 +64,7 @@ contract("ENS integration", function(accounts) {
       //.then(function(owner) {
         //assert.equal(owner, accounts[0], 'owner of the winning bid is correct');
         //return Promise.resolve(true);
-      //});
+      //})
+    )
   });
 });
