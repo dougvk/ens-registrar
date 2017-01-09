@@ -1,9 +1,37 @@
 #!/usr/bin/env node
 var yargs = require('yargs');
-var Registrar = require('../lib/ensAuction');
+var ENSAuction = require('../lib/ensAuction');
 var Web3 = require("web3");
 
 var args = yargs
+  .command('winner', 'Current winner of bid', function(yargs) {
+    return yargs.option('host', {
+      description: "HTTP host of Ethereum node",
+      alias: 'h',
+      default: 'testrpc'
+    })
+    .option('port', {
+      description: "HTTP port",
+      alias: 'p',
+      default: '8545'
+    })
+    .option('registrar', {
+      description: "The address of the registrar",
+      alias: 'r',
+      type: 'string'
+    })
+    .option('name', {
+      description: "The name you want to register",
+      alias: 'n',
+      type: "string"
+    })
+    .option('account', {
+      description: "The address to register the domain name",
+      alias: 'a',
+      type: "string"
+    })
+    .demand(['account', 'name', 'registrar'])
+  })
   .command('bid', 'Place a bid on a domain name', function(yargs) {
     return yargs.option('host', {
       description: "HTTP host of Ethereum node",
@@ -53,6 +81,11 @@ var args = yargs
       alias: 'p',
       default: '8545'
     })
+    .option('registrar', {
+      description: "The address of the registrar",
+      alias: 'r',
+      type: 'string'
+    })
     .option('name', {
       description: "The name you want to register",
       alias: 'n',
@@ -87,10 +120,31 @@ if (argv._.length == 0) {
 var command = argv._[0];
 
 if (command == 'bid') {
-  var provider = new Web3(new Web3.providers.HttpProvider("http://" + argv.host + ":" + argv.port));
-  provider.eth.defaultAccount = argv.account;
-  var registrar = new Registrar(provider, argv.registrar, argv.account);
-  registrar.createBid(argv.name, argv.account, argv.max, argv.secret, function() {
-    console.log("Created bid.");
-  });
+  var provider = new Web3.providers.HttpProvider("http://" + argv.host + ":" + argv.port);
+  var registrar = new ENSAuction(provider, argv.registrar, argv.account);
+  registrar.createBid(argv.name, argv.account, argv.max, argv.secret)
+    .then(function() {
+      console.log("Created bid for " + argv.name);
+    });
+}
+
+if (command == 'reveal') {
+  var provider = new Web3.providers.HttpProvider("http://" + argv.host + ":" + argv.port);
+  var registrar = new ENSAuction(provider, argv.registrar, argv.account);
+  registrar.revealBid(argv.name, argv.account, argv.max, argv.secret)
+    .then(function() {
+      return registrar.currentWinner(argv.name);
+    })
+    .then(function(owner) {
+      console.log("Revealed your bid. Current winner is account " + owner);
+    });
+}
+
+if (command == 'winner') {
+  var provider = new Web3.providers.HttpProvider("http://" + argv.host + ":" + argv.port);
+  var registrar = new ENSAuction(provider, argv.registrar, argv.account);
+  registrar.currentWinner(argv.name)
+    .then(function(owner) {
+      console.log("Current winner is account " + owner);
+    });
 }
