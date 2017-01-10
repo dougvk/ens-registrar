@@ -18,4 +18,4 @@ before_install:
   - docker ps
 
 script:
-  - docker-compose -f docker/docker-compose.yml run truffle /bin/sh -c "truffle migrate; truffle test"
+  - docker-compose -f docker/docker-compose.yml run truffle /bin/sh -c "npm install; truffle migrate; truffle test"

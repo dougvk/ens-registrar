@@ -9,8 +9,13 @@ services:
     command: bash -c "tail -f /dev/null"
     ports:
       - "7001:8080"
+    volumes_from:
+      - truffle_vol
+  truffle_vol:
+    image: busybox
+    container_name: truffle_vol
     volumes:
-      - truffle_vol:/app
+      - ../:/app
 
 volumes:
   truffle_vol:
