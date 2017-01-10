@@ -1,0 +1,16 @@
+version: '2'
+services:
+  testrpc:
+    image: dougvk/mydapp_testrpc:latest
+    command: bash -c "testrpc -h 0.0.0.0"
+  truffle:
+    image: dougvk/mydapp_truffle:latest
+    #command: bash -c "truffle migrate && truffle serve"
+    command: bash -c "tail -f /dev/null"
+    ports:
+      - "7001:8080"
+    volumes:
+      - truffle_vol:/app
+
+volumes:
+  truffle_vol:
