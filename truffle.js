@@ -9,6 +9,21 @@ module.exports = {
     ],
     "images/": "images/"
   },
+  networks: {
+    "ropsten": {
+      network_id: 1,
+      host: "159.203.82.211",
+      port: 7002
+    },
+    "staging": {
+      network_id: 1,
+      host: "159.203.82.211",
+      port: 7003
+    },
+    "development": {
+      network_id: "default"
+    }
+  },
   rpc: {
     host: "testrpc",
     port: 8545

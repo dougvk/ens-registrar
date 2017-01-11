@@ -19,3 +19,5 @@ before_install:
 
 script:
   - docker-compose -f docker/docker-compose.yml run truffle /bin/sh -c "npm install; truffle migrate; truffle test"
+  - docker-compose -f docker/docker-compose.yml run truffle /bin/sh -c "truffle migrate --network staging"
+  - docker-compose -f docker/docker-compose.yml run truffle /bin/sh -c "truffle migrate --network ropsten"

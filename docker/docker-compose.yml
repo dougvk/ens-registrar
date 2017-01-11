@@ -1,12 +1,13 @@
 version: '2'
 services:
   testrpc:
-    image: dougvk/mydapp_testrpc:latest
+    image: dougvk/mydapp_testrpc
     command: bash -c "testrpc -h 0.0.0.0"
   truffle:
-    image: dougvk/mydapp_truffle:latest
-    #command: bash -c "truffle migrate && truffle serve"
-    command: bash -c "tail -f /dev/null"
+    image: dougvk/mydapp_truffle
+    command: bash
+    stdin_open: true
+    tty: true
     ports:
       - "7001:8080"
     volumes_from:
@@ -16,6 +17,28 @@ services:
     container_name: truffle_vol
     volumes:
       - ../:/app
+  testnet:
+    image: dougvk/geth-testnet
+    stdin_open: true
+    tty: true
+    volumes:
+      - testnet_vol:/root
+    ports:
+      - "7002:8545"
+  devnet:
+    image: dougvk/geth-devnet
+    stdin_open: true
+    tty: true
+    volumes:
+      - devnet_vol:/tmp
+    ports:
+      - "7003:8545"
+  gethconsole:
+    image: kunstmaan/ethereum-geth-console
+    stdin_open: true
+    tty: true
 
 volumes:
   truffle_vol:
+  testnet_vol:
+  devnet_vol:
